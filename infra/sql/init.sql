@@ -3,7 +3,7 @@ id_carro SERIAL PRIMARY KEY,
 marca VARCHAR (50) NOT NULL,
 modelo VARCHAR (50) NOT NULL,
 ano INT,
-cor VARCHAR (50)
+cor VARCHAR (20)
 );
 
 SELECT * FROM Carro;

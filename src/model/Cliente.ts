@@ -1,103 +1,48 @@
-    /**
- * Classe que representa cliente.
+import { query } from "express";
+import { DatabaseModel } from "./DatabaseModel";
+
+const database = new DatabaseModel().pool;
+
+/**
+ * Representa um cliente com identificador único, nome, CPF e telefone.
  */
- /* Atributos */
-    /* Identificador do cliente */
-    export class Cliente{
-        private idCliente: number = 0;
-    /* nome do cliente */
-    private nome: string;
-    /* cpf do cliente */
-    private cpf: number;
-    /* telefone do cliente */
-    private telefone: number;
-    /**
-     * Construtor da classe Carro
-     * 
-     * @param nome nome do cliente
-     * @param cpf cpf do cliente
-     * @param telefone telefone do cliente
-     */
-    constructor(
-        nome: string,
-        cpf: number,
-        telefone: number,
-    ) {
-        this.nome = nome;
-        this.cpf = cpf;
+@@ -104,4 +109,39 @@ export class Cliente {
+    public setTelefone(telefone: string): void {
         this.telefone = telefone;
     }
 
-    
-    /* Métodos get e set */
     /**
-     * Recupera o identificador do cliente
-     * @returns o identificador do cliente
-     */
-    public getIdCliente(): number {
-        return this.idCliente;
-    }
-
-    /**
-     * Atribui um valor ao identificador do cliente
-     * @param idCliente novo identificado do cliente
-     */
-    public setIdCliente(idCliente: number): void {
-        this.idCliente = idCliente;
-    }
-
-    /**
-     * Retorna o nome do cliente.
-     *
-     * @returns {string} o nome do cliente.
-     */
-    public getNome(): string {
-        return this.nome;
-    }
-
-    /**
-     * Define o nome do cliente.
+     * Busca e retorna uma lista de clientes do banco de dados.
+     * @returns Um array de objetos do tipo `Cliente` em caso de sucesso ou `null` se ocorrer um erro durante a consulta.
      * 
-     * @param nome - O nome do cliente a ser definido.
+     * - A função realiza uma consulta SQL para obter todos os registros da tabela "cliente".
+     * - Os dados retornados são utilizados para instanciar objetos da classe `Cliente`.
+     * - Cada cliente instanciado é adicionado a uma lista que será retornada ao final da execução.
+     * - Se houver uma falha na consulta ao banco, a função captura o erro, exibe uma mensagem no console e retorna `null`.
      */
-    public setNome(nome: string): void {
-        this.nome = nome;
-    }
+    static async listagemClientes(): Promise<Array<Cliente> | null> {
+        const listaDeClientes: Array<Cliente> = [];
 
-    /**
-     * Retorna o cpf do cliente.
-     *
-     * @returns {number} O cpf do cliente.
-     */
-    public getCpf(): number {
-        return this.cpf;
-    }
+        try {
+            const querySelectCliente = `SELECT * FROM cliente`;
+            const respostaBD = await database.query(querySelectCliente);
 
-    /**
-     * Define o cpf do cliente.
-     *
-     * @param cpf - O cpf do cliente.
-     */
-    public setCpf(cpf: number): void {
-        this.cpf = cpf;
-    }
+            respostaBD.rows.forEach((linha) => {
+                const novoCliente = new Cliente(
+                    linha.nome,
+                    linha.cpf,
+                    linha.telefone
+                );
 
-    /**
-     * Retorna o telefone do cliente.
-     *
-     * @returns O telefone do cliente.
-     */
-    public getTelefone(): number {
-        return this.telefone;
-    }
+                novoCliente.setIdCliente(linha.id_cliente);
 
-    /**
-     * Define o telefone do cliente.
-     * 
-     * @param telefone - O telefone deve ser definido para o cliente.
-     */
-    public setTelefone(telefone: number): void {
-        this.telefone = telefone;
-    }
+                listaDeClientes.push(novoCliente);
+            });
 
+            return listaDeClientes;
+        } catch (error) {
+            console.log('Erro ao buscar lista de carros');
+            return null;
+        }
+    }
 }
