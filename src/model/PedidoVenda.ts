@@ -172,7 +172,7 @@ export class PedidoVenda {
      * @throws {Error} - Se ocorrer algum erro durante a execução do cadastro, uma mensagem de erro é exibida
      *                   no console junto com os detalhes do erro.
      */
-static async cadastropedidovenda(pedidoVenda: PedidoVenda): Promise<boolean> {
+static async cadastroPedidoVenda(pedidoVenda: PedidoVenda): Promise<boolean> {
     try {
         // query para fazer insert de um carro no banco de dados
         const queryInsertPedidoVenda = `INSERT INTO carro (nome, cpf, telefone)
