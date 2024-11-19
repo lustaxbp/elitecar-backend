@@ -12,18 +12,25 @@ router.get("/", (req: Request, res: Response) => {
 });
 
 /* 
-* ROTAS PARA CARROS
+* ROTAS PARA CARROS\
 */ 
 // Rota para listar os carros
 router.get("/lista/carros", CarroController.todos);
 router.post("/novo/carro", CarroController.novo);
+router.delete("/delete/carro/:idCarro", CarroController.remover);
+router.put("/atualizar/carro/:idCarro", CarroController.atualizar);
 
 /* 
 * ROTAS PARA CLIENTES
 */ 
 // Rota para listar os clientes
 router.get("/lista/clientes", ClienteController.todos);
+//rota para cadastrar novo cliente
 router.post("/novo/clientes", ClienteController.novo);
+//rota para deletar um cliente
+router.delete("/delete/cliente/:idCliente", ClienteController.remover);
+// Rota para atualizar um cliente
+router.put("/atualizar/cliente/:idCliente", ClienteController.atualizar);
 /* 
 * ROTAS PARA PEDIDOS
 */ 

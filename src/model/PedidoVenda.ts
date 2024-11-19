@@ -15,9 +15,9 @@ export class PedidoVenda {
      */
     private idCarro: number;
     /**
-     * Identificador do cliente associado ao pedido de venda.
+     * Identificador do pedido associado ao pedido de venda.
      */
-    private idCliente: number;
+    private idpedido: number;
     /**
      * Data do pedido de venda.
      */
@@ -30,13 +30,13 @@ export class PedidoVenda {
     /**
      * Construtor da classe PedidoVenda.
      * @param idCarro - Identificador do carro.
-     * @param idCliente - Identificador do cliente.
+     * @param idpedido - Identificador do pedido.
      * @param dataPedido - Data do pedido.
      * @param valorPedido - Valor do pedido.
      */
-    constructor(idCarro: number, idCliente: number, dataPedido: Date, valorPedido: number) {
+    constructor(idCarro: number, idpedido: number, dataPedido: Date, valorPedido: number) {
         this.idCarro = idCarro;
-        this.idCliente = idCliente;
+        this.idpedido = idpedido;
         this.dataPedido = dataPedido;
         this.valorPedido = valorPedido;
     }
@@ -74,19 +74,19 @@ export class PedidoVenda {
     }
 
     /**
-     * Obtém o identificador do cliente.
-     * @returns O identificador do cliente.
+     * Obtém o identificador do pedido.
+     * @returns O identificador do pedido.
      */
-    public getIdCliente(): number {
-        return this.idCliente;
+    public getIdpedido(): number {
+        return this.idpedido;
     }
 
     /**
-     * Define o identificador do cliente.
-     * @param idCliente - Novo identificador do cliente.
+     * Define o identificador do pedido.
+     * @param idpedido - Novo identificador do pedido.
      */
-    public setIdCliente(idCliente: number): void {
-        this.idCliente = idCliente;
+    public setIdpedido(idpedido: number): void {
+        this.idpedido = idpedido;
     }
 
     /**
@@ -140,7 +140,7 @@ export class PedidoVenda {
             respostaBD.rows.forEach((linha: any) => {
                 const novoPedidoVenda = new PedidoVenda(
                     linha.id_carro,
-                    linha.id_cliente,
+                    linha.id_pedido,
                     linha.data_pedido,
                     parseFloat(linha.valor_pedido)
                 );
@@ -159,13 +159,13 @@ export class PedidoVenda {
 /**
      * Realiza o cadastro de pedido no banco de dados.
      * 
-     * Esta função recebe um objeto do tipo `Pedido` e insere seus dados (idCarro,idCliente,dataPedido,valorPedido)
+     * Esta função recebe um objeto do tipo `Pedido` e insere seus dados (idCarro,idpedido,dataPedido,valorPedido)
      * na tabela `pedidoVEndas` do banco de dados. O método retorna um valor booleano indicando se o cadastro 
      * foi realizado com sucesso.
      * 
      * @param {PedidoVenda} pedido_venda - Objeto contendo os dados do pedido que será cadastrado. O objeto `pedidoVenda`
-     *                        deve conter os métodos `getIdCarro()`, `getIdcliente()`, `getDatapedido(),`getValorPedido`` 
-     *                        que retornam os respectivos valores do cliente.
+     *                        deve conter os métodos `getIdCarro()`, `getIdpedido()`, `getDatapedido(),`getValorPedido`` 
+     *                        que retornam os respectivos valores do pedido.
      * @returns {Promise<boolean>} - Retorna `true` se o pedido foi cadastrado com sucesso e `false` caso contrário.
      *                               Em caso de erro durante o processo, a função trata o erro e retorna `false`.
      * 
@@ -177,11 +177,11 @@ static async cadastroPedidoVenda(pedidoVenda: PedidoVenda): Promise<boolean> {
         // query para fazer insert de um carro no banco de dados
         const queryInsertPedidoVenda = `INSERT INTO carro (nome, cpf, telefone)
                                     VALUES
-                                    (${pedidoVenda.getIdCliente()}, 
+                                    (${pedidoVenda.getIdpedido()}, 
                                     ${pedidoVenda.getIdCarro()}, 
                                     ${pedidoVenda.getValorPedido()},
                                     ${pedidoVenda.getDataPedido()}, 
-                                    RETURNING id_cliente;`;
+                                    RETURNING id_pedido;`;
 
         // executa a query no banco e armazena a resposta
         const respostaBD = await database.query(queryInsertPedidoVenda);
@@ -198,11 +198,70 @@ static async cadastroPedidoVenda(pedidoVenda: PedidoVenda): Promise<boolean> {
         // tratando o erro
     } catch (error) {
         // imprime outra mensagem junto com o erro
-        console.log('Erro ao cadastrar o cliente. Verifique os logs para mais detalhes.');
+        console.log('Erro ao cadastrar o pedido. Verifique os logs para mais detalhes.');
         // imprime o erro no console
         console.log(error);
         // retorno um valor falso
         return false;
     }
 }
+static async removerPedidoVenda(idPedido: number): Promise<boolean>{
+    try {
+        const queryDeletePedido = `DELETE FROM pedido_venda WHERE id_pedido = ${idPedido}`;
+        const respostaBD = await database.query(queryDeletePedido);
+        if(respostaBD.rowCount !=0){
+            console.log(`Pedido removido com sucesso ! `);
+            return true;
+        }
+        return false;
+        
+    } catch (error) {
+        console.log(`ERRO ao remover Pedido. verifique os logs para mais detalhes.`);
+        console.log(error);
+        return false;
+    }
+}
+
+
+    /**
+     * Atualiza as informações de um pedido no banco de dados.
+     *
+     * @param {Pedido} pedido - O objeto pedido contendo as informações atualizadas.
+     * @returns {Promise<boolean>} - Retorna uma Promise que resolve para true se a atualização foi bem-sucedida, ou false caso contrário.
+     *
+     * @throws {Error} - Lança um erro se ocorrer algum problema durante a execução da query.
+     */
+    static async atualizarpedido(pedido: PedidoVenda): Promise<boolean> {
+        try {
+            // cria a query de update a ser executada no banco de dados
+            const queryUpdatepedido = `UPDATE pedido SET
+                                        id_pedido = ${pedido.getIdPedido()},
+                                        id_carro = ${pedido.getIdCarro()},
+                                        valorPedido = ${pedido.getValorPedido()},
+                                        dataPedido = ${pedido.getDataPedido()}
+                                        WHERE id_carro = ${pedido.getIdpedido()};`;
+
+            // executar a query e armazenar a resposta do banco de dados em uma variável
+            const respostaBD = await database.query(queryUpdatepedido);
+
+            // verifica se alguma linha foi alterada
+            if(respostaBD.rowCount != 0) {
+                // imprime uma mensagem de sucesso no console
+                console.log(`pedido atualizado com sucesso! ID: ${pedido.getIdpedido()}`);
+                // retorna ture, indicando que a query foi executada com sucesso
+                return true;
+            }
+
+            // retorna falso, indicando que a query não foi executada com sucesso
+            return false;
+
+        } catch (error) {
+            // exibe uma mensagem de falha
+            console.log(`Erro ao atualizar o pedido. Verifique os logs para mais detalhes.`);
+            // imprime o erro no console da API
+            console.log(error);
+            // retorna false, o que indica que a remoção não foi feita
+            return false;
+        }
+    }
 }

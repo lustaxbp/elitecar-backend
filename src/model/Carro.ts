@@ -223,5 +223,46 @@ export class Carro {
             return false;
         }
     }
+
+    static async removerCarro(idCarro: number): Promise<boolean>{
+        try {
+            const queryDeleteCarro = `DELETE FROM carro WHERE id_carro = ${idCarro}`;
+            const respostaBD = await database.query(queryDeleteCarro);
+            if(respostaBD.rowCount !=0){
+                console.log(`Carro removido com sucesso ! `);
+                return true;
+            }
+            return false;
+            
+        } catch (error) {
+            console.log(`ERRO ao remover carro. verifique os logs para mais detalhes.`);
+            console.log(error);
+            return false;
+        }
+    }
+
+    static async atualizarCarro(carro:Carro): Promise<boolean>{
+        try {
+            const queryUpdateCarro = `UPDATE carro SET 
+                                    marca = ${carro.getMarca()},
+                                    modelo = ${carro.getModelo()},
+                                    ano = ${carro.getAno()},
+                                    cor = ${carro.getCor()},
+                                    WHERE id_carro = ${carro.getIdCarro()};`;   
+        const respostaBD = await database.query(queryUpdateCarro);
+
+        if(respostaBD.rowCount ! = 0){
+            console.log(`Carro atualizado com sucesso id: ${carro.getIdCarro()} `)
+            return true;
+        }
+        return false;
+
+        } catch (error) {
+            console.log(`Erro ao atualizar o carro !`);
+            console.log(error);
+            return false;
+        }
+    }
+    
 }
 
